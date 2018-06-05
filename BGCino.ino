@@ -2,6 +2,8 @@
 #include <FastPID.h>
 #include <MPU6050_tockn.h>
 #include "BrushlessServo.h"
+#include <TimerOne.h>
+#include "SmartBLDC.h"
 
 #include "config.h"
 
@@ -9,7 +11,16 @@ FastPID PID(PID_P, PID_I, PID_D, PID_HZ, PID_BITS, PID_SIGNED);
 
 MPU6050 mpu6050(Wire);
 
-BrushlessServo bldc[3];
+//BrushlessServo bldc[3];
+
+SmartBLDC bldc[AXIS];
+
+
+// Обработчик прерываний таймера для оперирования PWM сигналом
+void pwmHandler()
+{
+    //BLDC_A.handle();
+}
 
 void setup() {
   
@@ -30,9 +41,13 @@ void setup() {
   bldc[YAW].setOutputPower(BLDC_POWER);
   
   // кол-во периодов синусоиды на оборот
-  bldc[PITCH].setCycles(BLDC_CYCLES);
-  bldc[ROLL].setCycles(BLDC_CYCLES);
-  bldc[YAW].setCycles(BLDC_CYCLES);
+  //bldc[PITCH].setCycles(BLDC_CYCLES);
+  //bldc[ROLL].setCycles(BLDC_CYCLES);
+  //bldc[YAW].setCycles(BLDC_CYCLES);
+  
+  Timer1.initialize(10);  // 10 us = 100 kHz
+  Timer1.attachInterrupt(pwmHandler);
+  Timer1.pwm(BLDC_A0, 1023);
 
 }
 
